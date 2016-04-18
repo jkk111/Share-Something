@@ -1,0 +1,11 @@
+doctype
+html
+  head
+    style(href="style.css")
+  body
+    wrapper
+      h3 #{key}'s shares
+      ul
+        each val in shares
+          li
+            a(href=val.url)= val.name
