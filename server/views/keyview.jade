@@ -1,11 +1,15 @@
+- sharesCount = 0
+- highestIndex = 0
 doctype
 html
   head
-    style(href="style.css")
+    link(rel="stylesheet" href="/style.css")
   body
-    wrapper
+    #wrapper
       h3 #{key}'s shares
-      ul
-        each val in shares
-          li
-            a(href=val.url)= val.name
+      include ./list.jade
+      h3(class="bottomPadding") &nbsp;
+script.
+  highestIndex = #{highestIndex};
+  user = "#{key}"
+script(src="/shares.js")

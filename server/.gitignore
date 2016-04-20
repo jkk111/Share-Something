@@ -45,4 +45,7 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-server/shares.json
+root.crt
+ssl.crt
+ssl.key
+node_modules

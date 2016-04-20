@@ -21,7 +21,9 @@ function writeShares() {
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/static"))
 
-app.post("/exists", checkExists);
+app.post("/exists", function(req, res) {
+  checkExists(req, res);
+});
 
 
 // Registration should be handled from the chrome extension, so the webservers registration page isn't important
@@ -32,20 +34,31 @@ app.get("/register", function(req, res) {
             </form>`);
 });
 
+app.get("/remove/:key/:index", function(req, res) {
+  var key = req.params.key;
+  var i = req.params.index;
+  shares[key][i].removed = true;
+  res.send({success: true});
+})
+
 app.post("/register", function(req, res) {
-  checkExists(req, res, function() {
+  checkExists(req, res, null, function() {
     var key = req.body.key;
+    console.log(key)
     shares[key] = [];
     res.send({success: true});
     writeShares();
   });
 });
 
-function checkExists(req, res, cb) {
+function checkExists(req, res, next, cb) {
   var key = req.body.key;
+  if(key == undefined) {
+    return res.status(400).send({err: "ERR_NO_KEY"});
+  }
   if(shares[key] != undefined) {
     return res.send({exists: true});
-  } else if(cb) {
+  } else if(next === null && cb) {
     cb();
   } else {
     res.send({exists: false})
@@ -68,21 +81,22 @@ app.post("/add", function(req, res) {
   }
 });
 
-app.get("/shares/:key", function(req, res) {
+app.get("/shares/:key.json", function(req, res) {
   var key = req.params.key;
   if(!shares[key]) {
-    return res.send(404).send(`Share: ${key} not found`);
+    return res.send(404).send({err: "SHARE_NOT_FOUND"});
   } else {
     res.json(shares[key]);
   }
 })
 
-app.get("/:key", function(req, res, next) {
+app.get("/shares/:key", function(req, res, next) {
   var key = req.params.key;
+  console.log(key);
   if(shares[key]) {
     res.render("keyview", {shares: shares[key], key: key})
   } else {
-    if(next) next();
+    return res.send(404).send(`Share: ${key} not found`);
   }
 });
 

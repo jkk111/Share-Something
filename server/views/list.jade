@@ -1,0 +1,13 @@
+ul#shares
+  each val, i in shares
+    if(i > highestIndex)
+      - highestIndex = i
+    if(!val.removed)
+      - sharesCount++
+      li(id="share-#{i}")
+        a(href="/shares/#{key}#share-#{i}" class="index")= i
+        a(href=val.url)= val.name
+        a(class="remove" href="/remove/" + key + "/" + i) X
+  if sharesCount === 0
+    a(href="#")
+      h1(class="noPosts") get the chrome extension to start adding shares

@@ -1,0 +1,42 @@
+html, body {
+  background-color: #FFD1CB;
+  min-height: 100%;
+  margin: 0;
+}
+h3 {
+  text-align: center;
+}
+ul {
+  list-style: none;
+  background-color: #eee;
+  width: 75%;
+  margin-left: 12.5%;
+  padding: 4px 0;
+}
+li {
+  font-size: 24px;
+  margin: 20px;
+  padding: 4px;
+  text-align: center;
+  background-color: #ddd;
+  border-radius: 25px;
+}
+.remove {
+  float: right;
+  padding-right: 16px;
+}
+.bottomPadding {
+  opacity: 0;
+}
+.noPosts {
+  padding: 200px 0;
+  text-align: center;
+}
+ul {
+  border-radius: 25px;
+}
+.index {
+  float: left;
+  color: #949494;
+  padding-left: 16px;
+}
