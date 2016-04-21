@@ -34,12 +34,27 @@ app.get("/register", function(req, res) {
             </form>`);
 });
 
+function getShares(base) {
+
+}
+
 app.get("/remove/:key/:index", function(req, res) {
   var key = req.params.key;
   var i = req.params.index;
   shares[key][i].removed = true;
   res.send({success: true});
-})
+});
+
+app.post("/copy", function(req, res, next) {
+  var src = req.body.src;
+  var dest = req.body.dest;
+  if(src && dest && shares[src] && shares[dest]) {
+    shares[dest] = shares[dest].concat(shares[src]);
+    res.send({success: true});
+  } else {
+    next();
+  }
+});
 
 app.post("/register", function(req, res) {
   checkExists(req, res, null, function() {
