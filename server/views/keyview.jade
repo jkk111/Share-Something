@@ -6,6 +6,11 @@ html
     link(rel="stylesheet" href="/style.css")
   body
     #wrapper
+      form#copy(method="POST" action="/copy")
+        label Copy to:
+        input(type="text" name="dest" placeholder="destination")
+        input(type="hidden" name="src" value="#{key}")
+        input(type="submit")
       h3 #{key}'s shares
       include ./list.jade
       h3(class="bottomPadding") &nbsp;

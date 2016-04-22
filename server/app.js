@@ -16,4 +16,5 @@ try {
   });
 } catch(e) {
   console.error("Cerificates not found, starting in http only mode", e);
+  http.createServer(index).listen(process.argv[3] || 443)
 }

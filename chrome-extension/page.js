@@ -1,5 +1,5 @@
-var server = "http://localhost:8080";
-var secureServer = "https://localhost:8443";
+var server = "//localhost:8080";
+var secureServer = "//localhost:8443";
 chrome.runtime.onMessage.addListener(function(req, sender, res) {
   if(req.type == "openNameInput") {
     promptForName(req.name, function(name) {
@@ -136,7 +136,7 @@ function encodeObj(obj) {
 }
 
 function getDomain() {
-  if(window.protocol === "http:") {
+  if(window.location.protocol === "http:") {
     return server;
   } else {
     return secureServer;

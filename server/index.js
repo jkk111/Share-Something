@@ -52,7 +52,8 @@ app.post("/copy", function(req, res, next) {
     shares[dest] = shares[dest].concat(shares[src]);
     res.send({success: true});
   } else {
-    next();
+    var missing = shares[dest] === undefined ? dest : src;
+    res.status(404).send(`Could not find key: ${missing}`);
   }
 });
 
