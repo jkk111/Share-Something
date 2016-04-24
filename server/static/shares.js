@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
   var removalButtons = document.getElementsByClassName("remove");
-  sharesList = document.getElementById("shares");
+  sharesList = document.getElementById("shareslist");
   for(var i = 0; i < removalButtons.length; i++) {
     var el = removalButtons[i];
     el.addEventListener("click", removeHandler);
@@ -42,6 +42,10 @@ function buildShares(items) {
     if(item.removed)
       continue;
     var el = document.createElement("li");
+    var index = document.createElement("a");
+    index.classList.add("index");
+    index.innerHTML = i;
+    index.href = `/shares/${user}#share-${i}`;
     var link = document.createElement("a");
     var removeLink = document.createElement("a");
     removeLink.addEventListener("click", removeHandler);
@@ -50,6 +54,7 @@ function buildShares(items) {
     removeLink.innerHTML = "X";
     removeLink.href = `/remove/${user}/${i}`
     removeLink.classList.add("remove");
+    el.appendChild(index);
     el.appendChild(link);
     el.appendChild(removeLink);
     var noPosts = document.getElementsByClassName("noPosts");

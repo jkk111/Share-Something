@@ -1,5 +1,5 @@
 var server = "http://localhost:8080";
-var secureServer = "https://localhost:8443";
+var secureServer = "http://localhost:8443";
 document.addEventListener("DOMContentLoaded", function() {
   console.log("hello world");
   var key = "jkk111"; // temporary will change to chrome storage

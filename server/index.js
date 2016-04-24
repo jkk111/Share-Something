@@ -14,6 +14,14 @@ try {
   writeShares();
 }
 
+function genRedirect(base) {
+  return `<script>
+            setTimeout(function() {
+             window.location.pathname = "/shares/${base}";
+            }, 5000);
+          </script>`;
+}
+
 function writeShares() {
   fs.writeFileSync("shares.json", JSON.stringify(shares, null, "\t"), "utf8");
 }
@@ -34,8 +42,43 @@ app.get("/register", function(req, res) {
             </form>`);
 });
 
-function getShares(base) {
+app.get("/search/:key", function(req, res) {
+  var q = req.query.q;
+  var key = req.params.key;
+  if(!key || !shares[key]) {
+    return res.status(404).send(`<h1>Could not find share: ${key || "<none_specified>"}</h1>`);
+  }
+  if(!q || q === "") {
+    return res.status(400).send(`<script>
+                                  setTimeout(function() {
+                                   window.location.pathname = "/shares/${key}";
+                                  }, 5000);
+                                 </script>
+                                 <h1>No query specified, returning</h1>`);
+  }
+  res.render("keyview", {shares: search(shares[key], q), key: key})
+});
 
+function search(items, q) {
+  var matches = [];
+  for(var i = 0; i < items.length; i++) {
+    var el = items[i];
+    if(el.name.indexOf(q) != -1 || el.url.indexOf(q) != -1) {
+      matches.push(el);
+    }
+  }
+  return matches;
+}
+
+function getShares(base) {
+  if(shares[base]) {
+    var start = shares[base].shares;
+    for(var i = 0; i < shares[base].copied.length; i++) {
+      start = shares[base].copied
+    }
+  } else {
+    return [];
+  }
 }
 
 app.get("/remove/:key/:index", function(req, res) {
@@ -49,13 +92,28 @@ app.post("/copy", function(req, res, next) {
   var src = req.body.src;
   var dest = req.body.dest;
   if(src && dest && shares[src] && shares[dest]) {
-    shares[dest] = shares[dest].concat(shares[src]);
+    if(src === dest) {
+      return res.status(400).send(`${genRedirect(src)}Cannot copy to self`);
+    }
+    // shares[dest] = shares[dest].concat(shares[src]);
+    copy(shares[src], shares[dest]);
+    writeShares()
     res.send({success: true});
   } else {
     var missing = shares[dest] === undefined ? dest : src;
-    res.status(404).send(`Could not find key: ${missing}`);
+    res.status(404).send(`${genRedirect("")}Could not find key: ${missing}`);
   }
 });
+
+function copy(src, dest) {
+  console.log(typeof src, src.length);
+  for(var i = 0 ; i < src.length; i++) {
+    console.log(i)
+    if(!src[i].removed) {
+      dest.push({name: src[i].name, url: src[i].url});
+    }
+  }
+}
 
 app.post("/register", function(req, res) {
   checkExists(req, res, null, function() {
