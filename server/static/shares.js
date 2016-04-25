@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function() {
     var el = removalButtons[i];
     el.addEventListener("click", removeHandler);
   }
-  setInterval(pollPosts, 1000);
 })
 
 function remove(url) {

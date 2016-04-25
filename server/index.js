@@ -56,7 +56,7 @@ app.get("/search/:key", function(req, res) {
                                  </script>
                                  <h1>No query specified, returning</h1>`);
   }
-  res.render("keyview", {shares: search(shares[key], q), key: key})
+  res.render("search", {shares: search(shares[key], q), key: key})
 });
 
 function search(items, q) {
