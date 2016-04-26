@@ -8,7 +8,10 @@ ul#shareslist
       li(id="share-#{i}")
         a(href="/shares/#{key}#share-#{i}" class="index")= i
         a(href=val.url)= val.name
-        a(class="remove" href="/remove/" + key + "/" + i) X
+        if(val.key === key)
+          a(class="remove" href="/remove/" + key + "/" + i) X
+        else
+          span(class="remove") &nbsp;&nbsp;&nbsp;
   if sharesCount === 0
     a(href="#")
       h1(class="noPosts") get the chrome extension to start adding shares

@@ -1,5 +1,8 @@
 var server = "//localhost:8080";
 var secureServer = "//localhost:8443";
+// chrome.storage.sync.remove("share_something_key", function() {
+//   console.log("removed");
+// })
 chrome.runtime.onMessage.addListener(function(req, sender, res) {
   if(req.type == "openNameInput") {
     promptForName(req.name, function(name) {

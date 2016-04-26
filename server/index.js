@@ -84,7 +84,8 @@ function getShares(base) {
 app.get("/remove/:key/:index", function(req, res) {
   var key = req.params.key;
   var i = req.params.index;
-  shares[key][i].removed = true;
+  if(shares[key].removed.indexOf(i) === -1)
+    shares[key].removed[i] = true;
   res.send({success: true});
 });
 
@@ -96,7 +97,7 @@ app.post("/copy", function(req, res, next) {
       return res.status(400).send(`${genRedirect(src)}Cannot copy to self`);
     }
     // shares[dest] = shares[dest].concat(shares[src]);
-    copy(shares[src], shares[dest]);
+    copy(src, dest);
     writeShares()
     res.send({success: true});
   } else {
@@ -106,20 +107,15 @@ app.post("/copy", function(req, res, next) {
 });
 
 function copy(src, dest) {
-  console.log(typeof src, src.length);
-  for(var i = 0 ; i < src.length; i++) {
-    console.log(i)
-    if(!src[i].removed) {
-      dest.push({name: src[i].name, url: src[i].url});
-    }
-  }
+  if(shares[dest].copies.indexOf(src) == -1)
+    shares[dest].copies.push(src);
 }
 
 app.post("/register", function(req, res) {
   checkExists(req, res, null, function() {
     var key = req.body.key;
     console.log(key)
-    shares[key] = [];
+    shares[key] = {copies: [], shares: []}
     res.send({success: true});
     writeShares();
   });
@@ -149,7 +145,7 @@ app.post("/add", function(req, res) {
   } else if(!url) {
     return res.status(400).send(`No URL Provided`);
   } else {
-    shares[key].push({name: name, url: url});
+    shares[key].shares.push({name: name, url: url, added: new Date().getTime(), key: key, index: shares[key].shares.length});
     res.json({success: true})
     writeShares();
   }
@@ -160,18 +156,80 @@ app.get("/shares/:key.json", function(req, res) {
   if(!shares[key]) {
     return res.send(404).send({err: "SHARE_NOT_FOUND"});
   } else {
-    res.json(shares[key]);
+    res.json(getShares(key));
   }
-})
+});
+
+function getShares(base, exclude) {
+  exclude = exclude || [];
+  exclude.concat([base]);
+  var ret = shares[base].shares || [];
+  for(var i = 0 ; i < (shares[base].copies || []).length; i++) {
+    var copy = shares[base].copies[i];
+    if(exclude.indexOf(copy) == -1 && shares[copy]) {
+      ret.concat(getShares(copy, exclude));
+    }
+  }
+  ret = ret.sort(sortByTime);
+  return ret;
+}
+
+function sortByTime(a, b) {
+  if(a.added > b.added)
+    return 1;
+  else if(a.added == b.added)
+    return 0;
+  return -1;
+}
 
 app.get("/shares/:key", function(req, res, next) {
   var key = req.params.key;
   console.log(key);
   if(shares[key]) {
-    res.render("keyview", {shares: shares[key], key: key})
+    res.render("keyview", {shares: getShares(key), key: key})
   } else {
     return res.send(404).send(`Share: ${key} not found`);
   }
 });
 
 module.exports = app;
+
+Object.prototype.extend = function() {
+  var ret = {};
+  for(var i = 0 ; i < arguments.length; i++) {
+    for(var p in arguments[i]) {
+      if(arguments[i].hasOwnProperty(p)) {
+        this[p] = arguments[i][[p]];
+      }
+    }
+  }
+};
+
+Object.prototype.combine = function() {
+  var ret = {};
+  for(var p in this) {
+    if(this.hasOwnProperty(p)) {
+      ret[p] = this[p];
+    }
+  }
+  for(var i = 0 ; i < arguments.length; i++) {
+    for(var p in arguments[i]) {
+      if(arguments[i].hasOwnProperty(p)) {
+        ret[p] = arguments[i][[p]];
+      }
+    }
+  }
+  return ret;
+};
+
+function combine() {
+  var ret = {};
+  for(var i = 0 ; i < arguments.length; i++) {
+    for(var p in arguments[i]) {
+      if(arguments[i].hasOwnProperty(p)) {
+        ret[p] = arguments[i][[p]];
+      }
+    }
+  }
+  return ret;
+}
